@@ -1,0 +1,76 @@
+---
+title: Assignment 03
+author:
+  - name: Gavin Boss
+    affiliations:
+      - id: bu
+        name: Boston University
+        city: Boston
+        state: MA
+number-sections: true
+date: '2025-09-20'
+format:
+  html:
+    theme: cerulean
+    toc: true
+    toc-depth: 2
+date-modified: today
+date-format: long
+execute:
+  echo: false
+  eval: true
+  freeze: auto
+---
+```{python}
+from pyspark.sql import SparkSession
+import pandas as pd
+import plotly.express as px
+import plotly.io as pio
+import numpy as np
+
+np.random.seed(42)
+
+pio.renderers.default = "notebook"
+
+# Initialize Spark Session
+spark = SparkSession.builder.appName("LightcastData").getOrCreate()
+
+# Load Data
+df = spark.read.option("header", "true").option("inferSchema", "true").option("multiLine","true").option("escape", "\"").csv("data/lightcast_job_postings.csv")
+
+# Show Schema and Sample Data
+print("---This is Diagnostic check, No need to print it in the final doc---")
+
+df.printSchema() # comment this line when rendering the submission
+df.show(5)
+```
+
+```{python}
+
+filtered_df = df.filter((df.SALARY_FROM.isNotNull()) & (df.SALARY_FROM > 0))
+
+pdf = filtered_df.select("NAICS2_NAME", "EMPLOYMENT_TYPE_NAME", "SALARY_FROM").toPandas()
+
+import plotly.express as px
+
+fig = px.box(
+    pdf,
+    x="NAICS2_NAME",
+    y="SALARY_FROM",
+    color="EMPLOYMENT_TYPE_NAME",
+    title="Salary Distribution by Industry and Employment Type",
+    color_discrete_sequence=px.colors.qualitative.Set2
+)
+
+fig.update_layout(
+    font_family="Arial",
+    title_font_size=16,
+    xaxis_title="Industry",
+    yaxis_title="Salary",
+    boxmode="group",
+    width=1000,
+    height=600
+)
+
+fig.show(renderer="iframe")
+```
