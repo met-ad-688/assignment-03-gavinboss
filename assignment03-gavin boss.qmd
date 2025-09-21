@@ -48,6 +48,21 @@ df = spark.read.option("header", "true").option("inferSchema", "true").option("m
 # df.show(5)
 ```
 
+# Companies Table
+```{python}
+companies_df = df.select(
+    col("company"),
+    col("company_name"),
+    col("company_raw"),
+    col("company_is_staffing")
+).distinct().withColumn("company_id", monotonically_increasing_id())
+
+companies = companies_df.toPandas()
+companies.drop(columns=["company"], inplace=True)
+companies.to_csv("./output/companies.csv", index=False)
+companies.head()
+```
+
 # Data Preparation (Clean Up Data)
 
 ```{python}
@@ -62,12 +77,14 @@ def compute_median(sdf, col_name):
 
 median_from = compute_median(df, "SALARY_FROM")
 median_to = compute_median(df, "SALARY_TO")
+median_salary =  compute_median(df, "SALARY")
 
-print("Medians :", median_from, median_to)
+print("Medians :", median_from, median_to, median_salary)
 
 df = df.fillna({
   "SALARY_FROM": median_from,
-  "SALARY_TO": median_to
+  "SALARY_TO": median_to,
+  "SALARY": median_salary
 })
 
 df = df.withColumn("Average_Salary", (col("SALARY_FROM") + col("SALARY_TO")) / 2)

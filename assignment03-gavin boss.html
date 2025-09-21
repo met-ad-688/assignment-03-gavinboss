@@ -50,8 +50,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#data-preparation-clean-up-data" id="toc-data-preparation-clean-up-data" class="nav-link active" data-scroll-target="#data-preparation-clean-up-data"><span class="header-section-number">1</span> Data Preparation (Clean Up Data)</a></li>
-  <li><a href="#salary-distribution-by-industry-and-employment-type" id="toc-salary-distribution-by-industry-and-employment-type" class="nav-link" data-scroll-target="#salary-distribution-by-industry-and-employment-type"><span class="header-section-number">2</span> Salary Distribution by Industry and Employment Type</a></li>
+  <li><a href="#companies-table" id="toc-companies-table" class="nav-link active" data-scroll-target="#companies-table"><span class="header-section-number">1</span> Companies Table</a></li>
+  <li><a href="#data-preparation-clean-up-data" id="toc-data-preparation-clean-up-data" class="nav-link" data-scroll-target="#data-preparation-clean-up-data"><span class="header-section-number">2</span> Data Preparation (Clean Up Data)</a></li>
+  <li><a href="#salary-distribution-by-industry-and-employment-type" id="toc-salary-distribution-by-industry-and-employment-type" class="nav-link" data-scroll-target="#salary-distribution-by-industry-and-employment-type"><span class="header-section-number">3</span> Salary Distribution by Industry and Employment Type</a></li>
   </ul>
 </nav>
 </div>
@@ -101,34 +102,96 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div id="fd4d407d" class="cell" data-execution_count="1">
+<div id="d1baa69e" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-stderr">
-<pre><code>Setting default log level to "WARN".
-To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-25/09/21 02:24:16 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-[Stage 1:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 44:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 </div>
-<section id="data-preparation-clean-up-data" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Data Preparation (Clean Up Data)</h1>
-<div id="b7415abb" class="cell" data-execution_count="2">
+<section id="companies-table" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Companies Table</h1>
+<div id="d8a5edeb" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 2:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 3:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 4:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 45:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">company_name</th>
+<th data-quarto-table-cell-role="th">company_raw</th>
+<th data-quarto-table-cell-role="th">company_is_staffing</th>
+<th data-quarto-table-cell-role="th">company_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Crowe</td>
+<td>Crowe</td>
+<td>False</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>The Devereux Foundation</td>
+<td>The Devereux Foundation</td>
+<td>False</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Elder Research</td>
+<td>Elder Research</td>
+<td>False</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>NTT DATA</td>
+<td>NTT DATA Inc</td>
+<td>False</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Frederick National Laboratory For Cancer Research</td>
+<td>Frederick National Laboratory for Cancer Research</td>
+<td>False</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="data-preparation-clean-up-data" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Data Preparation (Clean Up Data)</h1>
+<div id="e2884874" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 48:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 49:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 50:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 51:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Medians : 87295.0 130042.0
+<pre><code>Medians : 87295.0 130042.0 115024.0
 Data cleaning complete. Rows retained: 72498</code></pre>
 </div>
 </div>
 </section>
-<section id="salary-distribution-by-industry-and-employment-type" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Salary Distribution by Industry and Employment Type</h1>
-<div id="9c1f5a32" class="cell" data-execution_count="3">
+<section id="salary-distribution-by-industry-and-employment-type" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Salary Distribution by Industry and Employment Type</h1>
+<div id="f1ea53a1" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 5:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 52:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<iframe scrolling="no" width="1520px" height="920" src="iframe_figures/figure_3.html" frameborder="0" allowfullscreen=""></iframe>
+<iframe scrolling="no" width="1520px" height="920" src="iframe_figures/figure_21.html" frameborder="0" allowfullscreen=""></iframe>
 </div>
 </div>
 </section>
