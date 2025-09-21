@@ -27,6 +27,12 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import numpy as np
+pio.renderers.default = "svg"
+import re
+import plotly.graph_objects as go
+from pyspark.sql.functions import col, split, explode, regex_replace, transform, when
+from pyspark.sql import functions as F
+from pyspark.sql.functions import col, monotonically_increasing_id
 
 np.random.seed(42)
 
@@ -38,13 +44,15 @@ spark = SparkSession.builder.appName("LightcastData").getOrCreate()
 # Load Data
 df = spark.read.option("header", "true").option("inferSchema", "true").option("multiLine","true").option("escape", "\"").csv("data/lightcast_job_postings.csv")
 
-# Show Schema and Sample Data
-print("---This is Diagnostic check, No need to print it in the final doc---")
-
-df.printSchema() # comment this line when rendering the submission
-df.show(5)
+# df.printSchema() # comment this line when rendering the submission
+# df.show(5)
 ```
 
+# Data Preparation (Clean Up Data)
+
+
+
+# Salary Distribution by Industry and Employment Type
 ```{python}
 
 filtered_df = df.filter((df.SALARY_FROM.isNotNull()) & (df.SALARY_FROM > 0))
@@ -68,8 +76,18 @@ fig.update_layout(
     xaxis_title="Industry",
     yaxis_title="Salary",
     boxmode="group",
-    width=1000,
-    height=600
+    width=1500,
+    height=900,
+    font=dict(
+      family="Arial",
+      size=12,
+      color="black",
+    ),
+    title_font=dict(
+      family="Arial",
+      size=16,
+      color="black",
+    )
 )
 
 fig.show(renderer="iframe")
