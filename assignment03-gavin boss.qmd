@@ -19,7 +19,7 @@ date-format: long
 execute:
   echo: false
   eval: true
-  freeze: auto
+  freeze: true
 ---
 ```{python}
 from pyspark.sql import SparkSession
@@ -63,13 +63,19 @@ companies.to_csv("./output/companies.csv", index=False)
 companies.head()
 ```
 
+```{python}
+salary_df = df.filter(col("SALARY").isNotNull() & (col("SALARY") > 0))
+fig = px.histogram(salary_df.limit(5000).toPandas(), x="SALARY", nbins=50, title="Salary Distribution")
+```
+
 # Data Preparation (Clean Up Data)
 
 ```{python}
 df = df.withColumn("SALARY_FROM", col("SALARY_FROM").cast("float")) \
-       .withColumn("SALARY_TO", col("SALARY_TO").cast("float")) \
+       .withColumn("SALARY", col("SALARY").cast("float")) \
        .withColumn("MAX_YEARS_EXPERIENCE", col("MAX_YEARS_EXPERIENCE").cast("float")) \
-       .withColumn("MIN_YEARS_EXPERIENCE", col("MIN_YEARS_EXPERIENCE").cast("float"))
+       .withColumn("MIN_YEARS_EXPERIENCE", col("MIN_YEARS_EXPERIENCE").cast("float")) \
+       .withColumn("SALARY_TO", col("SALARY_TO").cast("float")) \
 
 def compute_median(sdf, col_name):
   q = sdf.approxQuantile(col_name, [0.5], 0.01)
@@ -94,6 +100,7 @@ export_cols = [
   "REMOTE_TYPE_NAME",
   "MAX_YEARS_EXPERIENCE",
   "Average_Salary",
+  "SALARY",
   "LOT_V6_SPECIALIZED_OCCUPATION_NAME"
 ]
 df_selected = df.select(*export_cols)
@@ -143,4 +150,38 @@ fig.update_layout(
 )
 
 fig.show(renderer="iframe")
+```
+
+```{python}
+import pandas as pd
+#filter out missing or zero salary values
+from pyspark.sql.functions import col
+pdf = df.filter(col("SALARY") > 0).select("EMPLOYMENT_TYPE_NAME", "SALARY").toPandas()
+pdf.head()
+```
+
+```{python}
+# Filtering out missing or zero salary values
+pdf = df.filter(df["SALARY"] > 0).select("EMPLOYMENT_TYPE_NAME", "SALARY").toPandas()
+
+# Clean employment types names for better readability
+pdf["EMPLOYMENT_TYPE_NAME"] = pdf["EMPLOYMENT_TYPE_NAME"].apply(
+    lambda x: re.sub(r"[\x00-\x7F]+", "", x) if isinstance(x, str) else ""
+)
+# Computer median salary for sorting
+median_salaries = pdf.groupby("EMPLOYMENT_TYPE_NAME")["SALARY"].median()
+
+# Sort employment types based on median salary in descending order
+sorted_employment_types = median_salaries.sort_values(ascending=False).index
+
+#Apply sorted categories
+pdf["EMPLOYMENT_TYPE_NAME"] = pd.Categorical(
+  pdf["EMPLOYMENT_TYPE_NAME"],
+  categories=sorted_employment_types,
+  ordered=True
+)
+
+# Create Box Plot with horizontal grid lines
+# fig = px.box(
+
 ```

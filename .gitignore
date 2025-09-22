@@ -172,4 +172,4 @@ cython_debug/
 lightcast_job_postings.csv
 data/lightcast_job_postings.csv
 data/lightcast_cleaned.csv
-output/companies.csv
+output/companies.csvlightcast_job_postings.csv
