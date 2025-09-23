@@ -172,7 +172,7 @@ median_salaries = pdf.groupby("EMPLOYMENT_TYPE_NAME")["SALARY"].median()
 # Sort employment types based on median salary in descending order
 sorted_employment_types = median_salaries.sort_values(ascending=False).index
 
-#Apply sorted categories
+
 pdf["EMPLOYMENT_TYPE_NAME"] = pd.Categorical(
   pdf["EMPLOYMENT_TYPE_NAME"],
   categories=sorted_employment_types,
@@ -181,16 +181,14 @@ pdf["EMPLOYMENT_TYPE_NAME"] = pd.Categorical(
 
 # Create Box Plot with horizontal grid lines
 # fig = px.box(
-
+# )
 ```
 # 3 Salary Analysis by ONET Occupation Type (Bubble Chart)
-
-# --Appendix 1: Asked Copilot to help, as my aggregation was not workiong correctly, but it was because of a mix of the aggregation and the sorting that we had done in the saturday help session. AI prompts attached.
+--Appendix 1: Asked Copilot to help, as my aggregation was not workiong correctly, but it was because of a mix of the aggregation and the sorting that we had done in the saturday help session. AI prompts attached.
 ```{python}
 from pyspark.sql.functions import col, expr, count
 import plotly.express as px
 
-# Step 1: Filter valid rows
 valid_df = df.filter(
     col("SALARY").isNotNull() & (col("SALARY") > 0) &
     col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull()
@@ -201,7 +199,7 @@ valid_df = df.filter(
     col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull() &
     (col("LOT_V6_SPECIALIZED_OCCUPATION_NAME") != "")
 )
-# Step 2: Aggregate using percentile_approx and count
+
 agg_df = df.filter(
     col("SALARY").isNotNull() & (col("SALARY") > 0) &
     col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull() &
@@ -212,10 +210,10 @@ agg_df = df.filter(
     count("*").alias("Job_Postings")
 ).withColumnRenamed("LOT_V6_SPECIALIZED_OCCUPATION_NAME", "Occupation_Name")
 
-# Step 3: Convert to Pandas
+# Converting to pandas
 bubble_pdf = agg_df.toPandas()
 
-# Step 4: Bubble Chart
+# Buble Chart
 fig = px.scatter(
     bubble_pdf,
     x="Occupation_Name",
@@ -239,4 +237,79 @@ fig.update_layout(
 )
 
 fig.show(renderer="iframe")
+```
+
+# 4 Salary by Education Level
+
+    Create two groups:
+        Associate’s or lower (GED, Associate, No Education Listed)
+        Bachelor’s (Bachelor’s degree)
+        Master’s (Master’s degree)
+        PhD (PhD, Doctorate, professional degree)
+    Plot scatter plots for each group using, MAX_YEARS_EXPERIENCE (with jitter), Average_Salary, LOT_V6_SPECIALIZED_OCCUPATION_NAME
+    After each graph, add a short explanation of key insights.
+
+```{python}
+from pyspark.sql.functions import col, when
+
+lower_deg = ["Bachelor's", "Associate", "GED", "No Education Listed", "High school"]
+higher_deg = ["Master's degree", "PhD or professional degree"]
+
+# Create education group column
+df = df.withColumn(
+    "EDU_GROUP",
+    when(col("EDUCATION_LEVELS_NAME").rlike("|".join([f"(?i){deg}" for deg in lower_deg])), "Bachelor's or lower")
+    .when(col("EDUCATION_LEVELS_NAME").rlike("|".join([f"(?i){deg}" for deg in higher_deg])), "Master's or PhD")
+    .otherwise("Other")
+)
+
+# Cast columns properly
+df = df.withColumn("MAX_YEARS_EXPERIENCE", col("MAX_YEARS_EXPERIENCE").cast("float"))
+df = df.withColumn("Salary", col("Salary").cast("float"))
+
+# Filter valid rows
+df = df.filter(
+    col("MAX_YEARS_EXPERIENCE").isNotNull() &
+    col("Salary").isNotNull() &
+    (col("MAX_YEARS_EXPERIENCE") > 0) &
+    (col("Salary") > 0)
+)
+
+# Filter by education group
+df_filtered = df.filter(col("EDU_GROUP").isin("Bachelor's or lower", "Master's or PhD"))
+
+# Convert to pandas
+df_pd = df_filtered.toPandas()
+```
+
+```{python}
+fig1 = px.scatter(
+    df_pd,
+    x="MAX_YEARS_EXPERIENCE",
+    y="Salary",
+    color="EDU_GROUP",
+    hover_data=["LOT_V6_SPECIALIZED_OCCUPATION_NAME"],
+    title="Experience vs Salary by Education Level",
+    opacity=0.7,
+    color_discrete_sequence=["#636efa", "#ef553b"]
+)
+
+fig1.update_traces(marker=dict(size=7, line=dict(width=1, color="black")))
+
+fig1.update_layout(
+    plot_bgcolor="#f9f9f9",
+    paper_bgcolor="#fff5dc",
+    font=dict(family="Segoe UI", size=14),
+    title_font=dict(size=22),
+    xaxis_title="Years of Experience",
+    yaxis_title="Average Salary (USD)",
+    legend_title="Education Group",
+    hoverlabel=dict(bgcolor="white", font_size=13, font_family="Arial"),
+    margin=dict(t=70, b=60, l=60, r=60),
+    xaxis=dict(gridcolor="lightgray", tickmode="linear", dtick=1),
+    yaxis=dict(gridcolor="lightgray")
+)
+
+fig1.show(renderer="iframe")
+fig1.write_html("output/q_1a_experience_vs_salary_by_education_level.html")
 ```
