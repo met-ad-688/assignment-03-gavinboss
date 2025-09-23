@@ -87,19 +87,17 @@ median_salary =  compute_median(df, "SALARY")
 
 print("Medians :", median_from, median_to, median_salary)
 
-df = df.fillna({
-  "SALARY_FROM": median_from,
-  "SALARY_TO": median_to,
-  "SALARY": median_salary
-})
+df = df.withColumn("SALARY", when(
+    col("SALARY").isNotNull() & (col("SALARY") > 0),
+    col("SALARY")
+).otherwise((col("SALARY_FROM") + col("SALARY_TO")) / 2))
 
-df = df.withColumn("Average_Salary", (col("SALARY_FROM") + col("SALARY_TO")) / 2)
+df = df.withColumn("SALARY", (col("SALARY_FROM") + col("SALARY_TO")) / 2)
 
 export_cols = [
   "EDUCATION_LEVELS_NAME",
   "REMOTE_TYPE_NAME",
   "MAX_YEARS_EXPERIENCE",
-  "Average_Salary",
   "SALARY",
   "LOT_V6_SPECIALIZED_OCCUPATION_NAME"
 ]
@@ -184,4 +182,61 @@ pdf["EMPLOYMENT_TYPE_NAME"] = pd.Categorical(
 # Create Box Plot with horizontal grid lines
 # fig = px.box(
 
+```
+# 3 Salary Analysis by ONET Occupation Type (Bubble Chart)
+
+# --Appendix 1: Asked Copilot to help, as my aggregation was not workiong correctly, but it was because of a mix of the aggregation and the sorting that we had done in the saturday help session. AI prompts attached.
+```{python}
+from pyspark.sql.functions import col, expr, count
+import plotly.express as px
+
+# Step 1: Filter valid rows
+valid_df = df.filter(
+    col("SALARY").isNotNull() & (col("SALARY") > 0) &
+    col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull()
+)
+
+valid_df = df.filter(
+    col("SALARY").isNotNull() & (col("SALARY") > 0) &
+    col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull() &
+    (col("LOT_V6_SPECIALIZED_OCCUPATION_NAME") != "")
+)
+# Step 2: Aggregate using percentile_approx and count
+agg_df = df.filter(
+    col("SALARY").isNotNull() & (col("SALARY") > 0) &
+    col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull() &
+    (col("LOT_V6_SPECIALIZED_OCCUPATION_NAME") != "")
+).groupBy("LOT_V6_SPECIALIZED_OCCUPATION_NAME") \
+ .agg(
+    expr("percentile_approx(SALARY, 0.5, 100)").alias("Median_Salary"),
+    count("*").alias("Job_Postings")
+).withColumnRenamed("LOT_V6_SPECIALIZED_OCCUPATION_NAME", "Occupation_Name")
+
+# Step 3: Convert to Pandas
+bubble_pdf = agg_df.toPandas()
+
+# Step 4: Bubble Chart
+fig = px.scatter(
+    bubble_pdf,
+    x="Occupation_Name",
+    y="Median_Salary",
+    size="Job_Postings",
+    color="Median_Salary",
+    title="Salary Analysis by ONET Occupation Type",
+    hover_name="Occupation_Name",
+    size_max=60,
+    template="plotly_white"
+)
+
+fig.update_layout(
+    xaxis_title="Occupation Type",
+    yaxis_title="Median Salary",
+    width=1400,
+    height=800,
+    font=dict(family="Helvetica Neue", size=14),
+    title_font=dict(size=28),
+    margin=dict(l=40, r=40, t=80, b=120)
+)
+
+fig.show(renderer="iframe")
 ```

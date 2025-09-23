@@ -1,0 +1,78 @@
+Appendix 1:
+
+prompt: how do I fix getting the same median salary throughout each occupation
+
+Response:
+You're getting the same median salary across all ONET occupations because your `SALARY` column was overwritten with a constant value during data cleaning. Here's how to fix it step-by-step:
+
+---
+
+### ✅ 1. **Avoid Overwriting SALARY with a Constant**
+
+In your current code:
+
+```python
+df = df.fillna({
+  "SALARY_FROM": median_from,
+  "SALARY_TO": median_to
+})
+
+df = df.withColumn("SALARY", (col("SALARY_FROM") + col("SALARY_TO")) / 2)
+```
+
+This fills missing `SALARY_FROM` and `SALARY_TO` with the same median, so any row missing salary data ends up with the same computed value — flattening the distribution.
+
+---
+
+### ✅ 2. **Use Conditional Logic to Preserve Original SALARY**
+
+Replace the overwrite with this:
+
+```python
+df = df.withColumn("SALARY", when(
+    col("SALARY").isNotNull() & (col("SALARY") > 0),
+    col("SALARY")
+).otherwise((col("SALARY_FROM") + col("SALARY_TO")) / 2))
+```
+
+This keeps the original `SALARY` if it's valid, and only computes it when missing.
+
+---
+
+### ✅ 3. **Double-Check Aggregation Logic**
+
+Make sure you're grouping correctly and using `percentile_approx` with enough accuracy:
+
+```python
+agg_df = df.filter(
+    col("SALARY").isNotNull() & (col("SALARY") > 0) &
+    col("LOT_V6_SPECIALIZED_OCCUPATION_NAME").isNotNull() &
+    (col("LOT_V6_SPECIALIZED_OCCUPATION_NAME") != "")
+).groupBy("LOT_V6_SPECIALIZED_OCCUPATION_NAME") \
+ .agg(
+    expr("percentile_approx(SALARY, 0.5, 100)").alias("Median_Salary"),
+    count("*").alias("Job_Postings")
+).withColumnRenamed("LOT_V6_SPECIALIZED_OCCUPATION_NAME", "Occupation_Name")
+```
+
+If you still see duplicates, try increasing the accuracy:
+
+```python
+expr("percentile_approx(SALARY, 0.5, 1000)")
+```
+
+---
+
+### ✅ 4. **Validate SALARY Distribution Before Aggregating**
+
+Run this to confirm variation:
+
+```python
+df.select("SALARY").distinct().show(20)
+```
+
+If you see only one or two values, the issue is upstream in your fill logic.
+
+---
+
+Once you fix the conditional logic, your bubble chart will reflect real differences in median salary across occupations. Let me know if you want to filter out low-volume occupations or sort by salary for a cleaner visual.
