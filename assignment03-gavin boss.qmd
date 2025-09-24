@@ -362,7 +362,7 @@ df_filtered2 = df.filter(col("EDU_GROUP").isin(["Associate's or lower", "Bachelo
 # Convert to pandas
 df_pd2 = df_filtered2.toPandas()
 ```
-
+#see appendix 2 -- asked ai to help me fix the data being in a straight line and it suggested the jitter.
 ```{python}
 import numpy as np
 
