@@ -10,6 +10,7 @@ author:
 number-sections: true
 date: '2025-09-20'
 format:
+  docx:default
   html:
     theme: cerulean
     toc: true
@@ -144,4 +145,67 @@ fig.update_traces(marker=dict(size=6))
 
 
 Let me know what your x-axis represents—I can help you fine-tune the jitter or suggest alternatives like violin plots or density contours if clustering is key.
+:::
+
+:::{.callout-tip}
+Appendix 3
+Prompt: if I have all the data in a dataset, but want individual histographs using plotly how can i do that
+:::
+
+:::{.callout-tip}
+To create individual histograms for each column in your dataset using Plotly, you can loop through the columns and generate a separate histogram for each one. Here's a clean and efficient way to do it using Plotly Express:
+✅ Example: Plotly Histograms for Each Column
+import plotly.express as px
+import pandas as pd
+
+# Load your dataset
+df = pd.read_csv('your_dataset.csv')  # or use any DataFrame
+
+# Loop through each column and plot histogram
+for col in df.select_dtypes(include='number').columns:
+    fig = px.histogram(df, x=col, title=f'Histogram of {col}')
+    fig.show()
+
+
+🔍 Notes:
+- select_dtypes(include='number') ensures you only plot numeric columns.
+- fig.show() will display each histogram one by one.
+- You can customize bins, colors, and layout using additional parameters in px.histogram.
+🛠 Optional Enhancements:
+- If you're working in Quarto or Jupyter and want to save each plot:
+fig.write_image(f"{col}_histogram.png")
+- To display all histograms in one dashboard-like layout, consider using plotly.subplots.
+Would you like help customizing bin sizes, colors, or exporting these for a report?
+:::
+
+:::{.callout-tip}
+prompt: i have three colums, and already have it jittered
+:::
+
+:::{.callout-tip}
+Perfect — if you’ve already jittered your data and want to create individual histograms for each of the three columns using Plotly, here’s how you can do it cleanly and efficiently:
+✅ Plotly Histograms for Jittered Columns
+Assuming your DataFrame is called df and the three jittered columns are named col1, col2, and col3:
+import plotly.express as px
+
+# List of your jittered columns
+columns = ['col1', 'col2', 'col3']
+
+# Loop through each column and plot histogram
+for col in columns:
+    fig = px.histogram(df, x=col, title=f'Histogram of {col}', nbins=30)
+    fig.update_layout(bargap=0.1)
+    fig.show()
+
+
+🔧 Optional Enhancements:
+- Customize bins: Use nbins=30 or adjust based on your data spread.
+- Overlay KDE (density): Plotly doesn’t support KDE directly in px.histogram, but you can simulate it using go.Figure if needed.
+- Color by category: If you have a categorical column like group, you can do:
+fig = px.histogram(df, x=col, color='group', barmode='overlay')
+
+
+📊 If You Want All Histograms in One Figure:
+You can use make_subplots from plotly.subplots to stack them vertically or arrange them in a grid. Let me know if you want that layout and I’ll show you how.
+Would you like to export these as static images for your report or embed them in Quarto?
 :::

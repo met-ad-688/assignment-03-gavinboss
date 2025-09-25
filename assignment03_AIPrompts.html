@@ -121,7 +121,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 24, 2025</p>
+      <p class="date-modified">September 25, 2025</p>
     </div>
   </div>
     
@@ -250,6 +250,77 @@ Tip
 <li><p>Reduce marker size for better spacing: fig.update_traces(marker=dict(size=6))</p></li>
 </ul>
 <p>Let me know what your x-axis represents—I can help you fine-tune the jitter or suggest alternatives like violin plots or density contours if clustering is key.</p>
+</section>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Appendix 3 Prompt: if I have all the data in a dataset, but want individual histographs using plotly how can i do that</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To create individual histograms for each column in your dataset using Plotly, you can loop through the columns and generate a separate histogram for each one. Here’s a clean and efficient way to do it using Plotly Express: ✅ Example: Plotly Histograms for Each Column import plotly.express as px import pandas as pd</p>
+<section id="load-your-dataset" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Load your dataset</h1>
+<p>df = pd.read_csv(‘your_dataset.csv’) # or use any DataFrame</p>
+</section>
+<section id="loop-through-each-column-and-plot-histogram" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Loop through each column and plot histogram</h1>
+<p>for col in df.select_dtypes(include=‘number’).columns: fig = px.histogram(df, x=col, title=f’Histogram of {col}’) fig.show()</p>
+<p>🔍 Notes: - select_dtypes(include=‘number’) ensures you only plot numeric columns. - fig.show() will display each histogram one by one. - You can customize bins, colors, and layout using additional parameters in px.histogram. 🛠 Optional Enhancements: - If you’re working in Quarto or Jupyter and want to save each plot: fig.write_image(f”{col}_histogram.png”) - To display all histograms in one dashboard-like layout, consider using plotly.subplots. Would you like help customizing bin sizes, colors, or exporting these for a report?</p>
+</section>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>prompt: i have three colums, and already have it jittered</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Perfect — if you’ve already jittered your data and want to create individual histograms for each of the three columns using Plotly, here’s how you can do it cleanly and efficiently: ✅ Plotly Histograms for Jittered Columns Assuming your DataFrame is called df and the three jittered columns are named col1, col2, and col3: import plotly.express as px</p>
+<section id="list-of-your-jittered-columns" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> List of your jittered columns</h1>
+<p>columns = [‘col1’, ‘col2’, ‘col3’]</p>
+</section>
+<section id="loop-through-each-column-and-plot-histogram-1" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Loop through each column and plot histogram</h1>
+<p>for col in columns: fig = px.histogram(df, x=col, title=f’Histogram of {col}’, nbins=30) fig.update_layout(bargap=0.1) fig.show()</p>
+<p>🔧 Optional Enhancements: - Customize bins: Use nbins=30 or adjust based on your data spread. - Overlay KDE (density): Plotly doesn’t support KDE directly in px.histogram, but you can simulate it using go.Figure if needed. - Color by category: If you have a categorical column like group, you can do: fig = px.histogram(df, x=col, color=‘group’, barmode=‘overlay’)</p>
+<p>📊 If You Want All Histograms in One Figure: You can use make_subplots from plotly.subplots to stack them vertically or arrange them in a grid. Let me know if you want that layout and I’ll show you how. Would you like to export these as static images for your report or embed them in Quarto?</p>
 </section>
 </div>
 </div>
